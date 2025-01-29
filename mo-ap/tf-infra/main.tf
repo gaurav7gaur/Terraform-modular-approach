@@ -1,11 +1,11 @@
 terraform {
-  backend "azurerm" {
+  /*backend "azurerm" {
     resource_group_name  = "tf-backend"
     storage_account_name = "tfstatefilebackend01"
     container_name       = "tf-testing-infra"
     key                  = "3-tier-infra.tfstate"
 
-  }
+  }*/
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -21,7 +21,7 @@ provider "azurerm" {
       skip_shutdown_and_force_delete = true
     }*/
   }
-  subscription_id = "baa3252d-06b9-4e1b-a961-2ebe0501976c"
+  subscription_id = "4d14920f-f57e-4470-8ba0-04827bfd7f03"
 }
 
 variable "type" {
@@ -39,7 +39,7 @@ module "RG" {
 
 #commenting all below to destroy the resources
 
-/*
+
 module "VNET" {
   source        = "./VNet"
   rg_name       = module.RG.rg_name
@@ -80,6 +80,13 @@ module "nsg_rule1" {
   destination_address = "*"
 }
 
+module "pip" {
+  source = "./public-ip"
+  name   = "${var.type}-pip"
+  rg_name = module.RG.rg_name
+  location = module.RG.location
+}
+
 module "linuxvm1" {
   source         = "./LinuxVM"
   rg_name        = module.RG.rg_name
@@ -89,5 +96,5 @@ module "linuxvm1" {
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
+  public-ip-id   = module.pip.public-ip-id
 }
-*/

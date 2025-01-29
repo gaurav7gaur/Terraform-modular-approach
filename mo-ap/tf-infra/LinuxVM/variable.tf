@@ -42,3 +42,9 @@ variable "admin_password" {
   type        = string
   
 }
+
+variable "public-ip-id" {
+  description = "ID of the public IP"
+  type        = string
+  default = ""
+}
