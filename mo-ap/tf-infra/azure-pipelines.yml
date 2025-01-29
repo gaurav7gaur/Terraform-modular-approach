@@ -1,0 +1,85 @@
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: init
+    jobs:
+      - job: initialize
+        steps:
+          - task: TerraformTaskV4@4
+            displayName: init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendAzureRmUseEnvironmentVariablesForAuthentication: false
+              backendServiceArm: 'Free Trial(baa3252d-06b9-4e1b-a961-2ebe0501976c)'
+              backendAzureRmResourceGroupName: 'tf-backend'
+              backendAzureRmStorageAccountName: 'tfstatefilebackend01'
+              backendAzureRmContainerName: 'tf-testing-infra'
+              backendAzureRmKey: '3-tier-infra.tfstate'
+
+          - task: TerraformTaskV4@4
+            displayName: validate
+            inputs:
+              provider: 'azurerm'
+              command: 'validate'
+          - task: TerraformTaskV4@4
+            displayName: plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'Free Trial(baa3252d-06b9-4e1b-a961-2ebe0501976c)'
+          
+          - task: ArchiveFiles@2
+            displayName: archive
+            inputs:
+              rootFolderOrFile: '$(Build.SourcesDirectory)'
+              includeRootFolder: true
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+          - task: PublishBuildArtifacts@1
+            displayName: publish
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'tf'
+              publishLocation: 'Container'
+  - stage: apply
+    jobs:
+      - deployment: apply
+        environment: 'prod'
+        strategy:
+         runOnce:
+           deploy:
+            steps:
+              - task: DownloadPipelineArtifact@2
+                displayName: download
+                inputs:
+                  buildType: 'current'
+                  artifactName: 'tf'
+                  targetPath: '$(Pipeline.Workspace)'
+              - task: ExtractFiles@1
+                displayName: extract
+                inputs:
+                  archiveFilePatterns: '$(Pipeline.Workspace)/*.zip'
+                  destinationFolder: '$(Build.StagingDirectory)'
+                  cleanDestinationFolder: true
+                  overwriteExistingFiles: false
+              - task: TerraformTaskV4@4
+                displayName: init
+                inputs:
+                  provider: 'azurerm'
+                  command: 'init'
+                  backendServiceArm: 'Free Trial(baa3252d-06b9-4e1b-a961-2ebe0501976c)'
+                  backendAzureRmResourceGroupName: 'tf-backend'
+                  backendAzureRmStorageAccountName: 'tfstatefilebackend01'
+                  backendAzureRmContainerName: 'tf-testing-infra'
+                  backendAzureRmKey: '3-tier-infra.tfstate'
+              - task: TerraformTaskV4@4
+                displayName: 'apply'
+                inputs:
+                  provider: 'azurerm'
+                  command: 'apply'
+                  workingDirectory: '$(Build.StagingDirectory)/s'
+                  commandOptions: '--auto-approve'
+                  environmentServiceNameAzureRM: 'Free Trial(baa3252d-06b9-4e1b-a961-2ebe0501976c)'
