@@ -1,1 +1,1 @@
-# mo-ap
+Terraform Modules for modular approach of the Azure infra
