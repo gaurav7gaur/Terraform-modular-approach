@@ -54,7 +54,7 @@ module "subnet1" {
   rg_name              = module.VNET.vnet_rg
   location             = module.VNET.vnet_location
   subnet_address_space = ["22.0.0.0/24"]
-  vnet_name = module.VNET.vnet_name
+  vnet_name            = module.VNET.vnet_name
 }
 
 module "NSG1" {
@@ -81,9 +81,9 @@ module "nsg_rule1" {
 }
 
 module "pip" {
-  source = "./public-ip"
-  name   = "${var.type}-pip"
-  rg_name = module.RG.rg_name
+  source   = "./public-ip"
+  name     = "${var.type}-pip"
+  rg_name  = module.RG.rg_name
   location = module.RG.location
 }
 
@@ -97,4 +97,50 @@ module "linuxvm1" {
   admin_username = "azureuser"
   admin_password = "Password@1234"
   public-ip-id   = module.pip.public-ip-id
+}
+
+module "linuxvm2" {
+  source         = "./LinuxVM"
+  rg_name        = module.RG.rg_name
+  location       = module.RG.location
+  subnet_id      = module.subnet1.subnet_id
+  linux_vm_name  = "${var.type}-linuxvm2"
+  server_size    = "Standard_B1s"
+  admin_username = "azureuser"
+  admin_password = "Password@1234"
+}
+
+module "lb-pip" {
+  source   = "./public-ip"
+  name     = "${var.type}-lb-pip"
+  rg_name  = module.RG.rg_name
+  location = module.RG.location
+}
+
+module "lb" {
+  source             = "./load balancer"
+  lb-name            = "${var.type}-lb"
+  lb-rg              = module.RG.rg_name
+  lb-location        = module.RG.location
+  pip-id             = module.lb-pip.public-ip-id
+  backend-pool-name  = "${var.type}-backend-pool"
+  probe-name         = "probe"
+  probe-port         = 80
+  rule-name          = "rule"
+  rule-frontend-port = 80
+  rule-backend-port  = 80
+}
+
+module "lb-assoc1" {
+  source          = "./load balacer backend association"
+  nic-id          = module.linuxvm1.pvt-ip-id
+  ip-config-name  = module.linuxvm1.nic-ipconfig-name
+  backend-pool-id = module.lb.backend-pool-id
+}
+
+module "lb-assoc2" {
+  source          = "./load balacer backend association"
+  nic-id          = module.linuxvm2.pvt-ip-id
+  ip-config-name  = module.linuxvm2.nic-ipconfig-name
+  backend-pool-id = module.lb.backend-pool-id
 }
