@@ -40,7 +40,7 @@ stages:
         - task: ArchiveFiles@2
           displayName: archive-files
           inputs:
-            rootFolderOrFile: '$(Build.BinariesDirectory)'
+            rootFolderOrFile: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra'
             includeRootFolder: false
             archiveType: 'zip'
             archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
