@@ -41,7 +41,7 @@ stages:
         - task: CmdLine@2
           displayName: convert-to-JSON
           inputs:
-            script: 'terraform show -json $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.out > $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.json'
+            script: 'terraform show -json $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.out | jq . > $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.json'
             workingDirectory: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra/'
         - task: PublishBuildArtifacts@1
           displayName: publish-plan-as-JSON
