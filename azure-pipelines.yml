@@ -37,3 +37,10 @@ stages:
             commandOptions: '-out tfplan.out'
             workingDirectory: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra'
             environmentServiceNameAzureRM: 'tf-service-connection'
+
+        - task: PublishBuildArtifacts@1
+          displayName: publish-plan
+          inputs:
+            PathtoPublish: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.out'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
