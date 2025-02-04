@@ -38,9 +38,14 @@ stages:
             workingDirectory: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra'
             environmentServiceNameAzureRM: 'tf-service-connection'
 
-        - task: PublishBuildArtifacts@1
-          displayName: publish-plan
+        - task: CmdLine@2
+          displayName: convert-to-JSON
           inputs:
-            PathtoPublish: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.out'
+            script: 'terraform show -json $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.out > $(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.json'
+            workingDirectory: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra/'
+        - task: PublishBuildArtifacts@1
+          displayName: publish-plan-as-JSON
+          inputs:
+            PathtoPublish: '$(System.DefaultWorkingDirectory)/mo-ap/tf-infra/tfplan.json'
             ArtifactName: 'drop'
             publishLocation: 'Container'
