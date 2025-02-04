@@ -55,7 +55,7 @@ module "rg2" {
 }
 #commenting all below to destroy the resources
 
-
+/*
 module "VNET1" {
   source        = "./VNet"
   rg_name       = module.RG.rg_name
@@ -176,3 +176,4 @@ module "lb-assoc2" {
   ip-config-name  = module.linuxvm2.nic-ipconfig-name
   backend-pool-id = module.lb.backend-pool-id
 }
+*/
