@@ -50,7 +50,7 @@ stages:
           displayName: create-artifact
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
+            ArtifactName: '$(Build.BuildId)-build'
             publishLocation: 'Container'
           
         - task: UniversalPackages@0
@@ -62,3 +62,5 @@ stages:
             vstsFeedPublish: '1576bf74-cb00-4adc-bf92-da9e9fc15547/13f08513-58ee-443c-92b5-aa2ad9bb4a07'
             vstsFeedPackagePublish: 'mo-ap-package'
             versionOption: 'minor'
+
+        
