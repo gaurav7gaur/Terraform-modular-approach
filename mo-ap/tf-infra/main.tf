@@ -37,19 +37,19 @@ provider "azurerm" {
 variable "type" {
   description = "Type of the infra"
   type        = string
-  default     = "tf-mo-ap"
+  default     = "tf"
 
 }
 
 module "RG" {
   source   = "./RG"
-  rg_name  = "${var.type}-rg01"
+  rg_name  = "${var.type}-ci-rg01"
   location = "centralindia"
 }
 
 module "rg2" {
   source   = "./RG"
-  rg_name  = "${var.type}-rg02"
+  rg_name  = "${var.type}-si-rg02"
   location = "southindia"
 
 }
@@ -59,7 +59,7 @@ module "rg2" {
 module "VNET1" {
   source        = "./VNet"
   rg_name       = module.RG.rg_name
-  vnet_name     = "${var.type}-vnet"
+  vnet_name     = "${var.type}-ci-vnet01"
   address_space = ["22.0.0.0/20"]
   location      = module.RG.location
 }
@@ -67,13 +67,14 @@ module "VNET1" {
 module "Vnet2" {
   source        = "./VNet"
   rg_name       = module.rg2.rg_name
-  vnet_name     = "${var.type}-vnet2"
+  vnet_name     = "${var.type}-si-vnet01"
   address_space = ["21.0.0.0/20"]
+  location = module.rg2.location
 }
 
 module "subnet1" {
   source               = "./subnet"
-  subnet_name          = "subnet1"
+  subnet_name          = "subnet-ci-1-1"
   rg_name              = module.VNET1.vnet_rg
   location             = module.VNET1.vnet_location
   subnet_address_space = ["22.0.0.0/24"]
@@ -82,7 +83,7 @@ module "subnet1" {
 
 module "subnet2-1" {
   source               = "./subnet"
-  subnet_name          = "subnet1"
+  subnet_name          = "subnet-si-1-1"
   rg_name              = module.Vnet2.vnet_rg
   location             = module.Vnet2.vnet_location
   subnet_address_space = ["21.0.0.0/24"]
@@ -91,7 +92,7 @@ module "subnet2-1" {
 
 module "vnet1-nsg" {
   source    = "./NSG"
-  NSG_name  = "${var.type}-nsg1"
+  NSG_name  = "${var.type}-ci-nsg01"
   rg_name   = module.RG.rg_name
   location  = module.RG.location
   subnet_id = module.subnet1.subnet_id
@@ -99,7 +100,7 @@ module "vnet1-nsg" {
 
 module "vnet2-nsg" {
   source    = "./NSG"
-  NSG_name  = "${var.type}-nsg2"
+  NSG_name  = "${var.type}-si-nsg01"
   rg_name   = module.rg2.rg_name
   location  = module.rg2.location
   subnet_id = module.subnet2-1.subnet_id
@@ -138,7 +139,7 @@ module "nsg2-rule1" {
 
 module "linux-pip" {
   source   = "./public-ip"
-  name     = "${var.type}-linvm1-pip"
+  name     = "${var.type}-linvm01-pip"
   rg_name  = module.RG.rg_name
   location = module.RG.location
 }
@@ -148,7 +149,7 @@ module "linuxvm1" {
   rg_name        = module.RG.rg_name
   location       = module.RG.location
   subnet_id      = module.subnet1.subnet_id
-  linux_vm_name  = "${var.type}-linuxvm1"
+  linux_vm_name  = "${var.type}-linuxvm01"
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
@@ -160,7 +161,7 @@ module "linuxvm2" {
   rg_name        = module.RG.rg_name
   location       = module.RG.location
   subnet_id      = module.subnet1.subnet_id
-  linux_vm_name  = "${var.type}-linuxvm2"
+  linux_vm_name  = "${var.type}-linuxvm02"
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
@@ -168,7 +169,7 @@ module "linuxvm2" {
 
 module "windows-pip" {
   source   = "./public-ip"
-  name     = "${var.type}-winvm1-pip"
+  name     = "${var.type}-winvm01-pip"
   rg_name  = module.rg2.rg_name
   location = module.rg2.location
 
@@ -176,7 +177,7 @@ module "windows-pip" {
 
 module "windowsvm1" {
   source         = "./WindowsVM"
-  vm_name        = "${var.type}-winvm1"
+  vm_name        = "${var.type}-winvm01"
   location       = module.rg2.location
   rg_name        = module.rg2.rg_name
   admin_username = "azureuser"
@@ -188,14 +189,14 @@ module "windowsvm1" {
 
 module "lb-pip" {
   source   = "./public-ip"
-  name     = "${var.type}-lb-pip"
+  name     = "${var.type}-ci-lb-pip01"
   rg_name  = module.RG.rg_name
   location = module.RG.location
 }
 
 module "lb" {
   source             = "./load balancer"
-  lb-name            = "${var.type}-lb"
+  lb-name            = "${var.type}-ci-lb01"
   lb-rg              = module.RG.rg_name
   lb-location        = module.RG.location
   pip-id             = module.lb-pip.public-ip-id
