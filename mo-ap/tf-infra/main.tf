@@ -149,7 +149,7 @@ module "linuxvm1" {
   rg_name        = module.RG.rg_name
   location       = module.RG.location
   subnet_id      = module.subnet1.subnet_id
-  linux_vm_name  = "${var.type}-linuxvm01"
+  linux_vm_name  = "${var.type}-linvm01"
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
@@ -161,7 +161,7 @@ module "linuxvm2" {
   rg_name        = module.RG.rg_name
   location       = module.RG.location
   subnet_id      = module.subnet1.subnet_id
-  linux_vm_name  = "${var.type}-linuxvm02"
+  linux_vm_name  = "${var.type}-linvm02"
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
