@@ -221,3 +221,17 @@ module "lb-assoc2" {
   ip-config-name  = module.linuxvm2.nic-ipconfig-name
   backend-pool-id = module.lb.backend-pool-id
 }
+
+
+module "win-vmss01" {
+  source = "./vmss-windows"
+  vmss-name = "${var.type}-si-winvmss"
+  location = module.rg2.location
+  rg-name = module.rg2.rg_name
+  sku = "Standard_F2"
+  instances = 2
+  username = "azureuser"
+  Password = "Password!234"
+  source-image-sku = "2022-Datacenter-Server-Core"
+  subnet-id = module.subnet2-1.subnet_id
+}
