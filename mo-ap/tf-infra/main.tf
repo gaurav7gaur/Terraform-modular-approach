@@ -55,7 +55,7 @@ module "rg2" {
 }
 #commenting all below to destroy the resources
 
-/*
+
 module "VNET1" {
   source        = "./VNet"
   rg_name       = module.RG.rg_name
@@ -89,18 +89,27 @@ module "subnet2-1" {
   vnet_name            = module.Vnet2.vnet_name
 }
 
-module "NSG1" {
+module "vnet1-nsg" {
   source    = "./NSG"
-  NSG_name  = "${var.type}-nsg"
+  NSG_name  = "${var.type}-nsg1"
   rg_name   = module.RG.rg_name
   location  = module.RG.location
   subnet_id = module.subnet1.subnet_id
 }
 
-module "nsg_rule1" {
+module "vnet2-nsg" {
+  source    = "./NSG"
+  NSG_name  = "${var.type}-nsg2"
+  rg_name   = module.rg2.rg_name
+  location  = module.rg2.location
+  subnet_id = module.subnet2-1.subnet_id
+
+}
+
+module "nsg1-rule1" {
   source              = "./NSG Rules"
-  NSG_name            = module.NSG1.NSG_name
-  rg_name             = module.NSG1.nsg_rg
+  NSG_name            = module.vnet1-nsg.NSG_name
+  rg_name             = module.vnet1-nsg.nsg_rg
   rule_name           = "AllowSSH"
   priority            = 150
   direction           = "Inbound"
@@ -112,9 +121,24 @@ module "nsg_rule1" {
   destination_address = "*"
 }
 
-module "pip" {
+module "nsg2-rule1" {
+  source              = "./NSG Rules"
+  NSG_name            = module.vnet2-nsg.NSG_name
+  rg_name             = module.vnet2-nsg.nsg_rg
+  rule_name           = "Allowrdp"
+  priority            = 150
+  direction           = "Inbound"
+  access              = "Allow"
+  protocol            = "Tcp"
+  source_port         = "*"
+  destination_port    = "3389"
+  sources_address     = "*"
+  destination_address = "*"
+}
+
+module "linux-pip" {
   source   = "./public-ip"
-  name     = "${var.type}-pip"
+  name     = "${var.type}-linvm1-pip"
   rg_name  = module.RG.rg_name
   location = module.RG.location
 }
@@ -128,7 +152,7 @@ module "linuxvm1" {
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
-  public-ip-id   = module.pip.public-ip-id
+  public-ip-id   = module.linux-pip.public-ip-id
 }
 
 module "linuxvm2" {
@@ -140,6 +164,26 @@ module "linuxvm2" {
   server_size    = "Standard_B1s"
   admin_username = "azureuser"
   admin_password = "Password@1234"
+}
+
+module "windows-pip" {
+  source   = "./public-ip"
+  name     = "${var.type}-winvm1-pip"
+  rg_name  = module.rg2.rg_name
+  location = module.rg2.location
+
+}
+
+module "windowsvm1" {
+  source         = "./WindowsVM"
+  vm_name        = "${var.type}-winvm1"
+  location       = module.rg2.location
+  rg_name        = module.rg2.rg_name
+  admin_username = "azureuser"
+  admin_password = "Password@1234"
+  size           = "Standard_B1s"
+  subnet-id      = module.subnet2-1.subnet_id
+  pip-id         = module.windows-pip.public-ip-id
 }
 
 module "lb-pip" {
@@ -176,4 +220,3 @@ module "lb-assoc2" {
   ip-config-name  = module.linuxvm2.nic-ipconfig-name
   backend-pool-id = module.lb.backend-pool-id
 }
-*/
