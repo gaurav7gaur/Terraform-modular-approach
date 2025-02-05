@@ -17,7 +17,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
   size = var.size
   admin_username = var.admin_username
     admin_password = var.admin_password
-    vm_agent_platform_updates_enabled = true
+    vm_agent_platform_updates_enabled = false
     network_interface_ids = [azurerm_network_interface.nic.id]
     os_disk {
         caching = "ReadWrite"
@@ -26,7 +26,7 @@ resource "azurerm_windows_virtual_machine" "vm" {
       source_image_reference {
     publisher = "MicrosoftWindowsServer"
     offer     = "WindowsServer"
-    sku       = "2022-Datacenter"
+    sku       = var.image //"2022-Datacenter"
     version   = "latest"
   }
 }

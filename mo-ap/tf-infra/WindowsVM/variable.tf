@@ -52,3 +52,7 @@ variable "pip-id" {
 variable "size" {
   description = "size of the vM"
 }
+
+variable "image" {
+  
+}

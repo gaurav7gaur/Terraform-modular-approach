@@ -69,7 +69,7 @@ module "Vnet2" {
   rg_name       = module.rg2.rg_name
   vnet_name     = "${var.type}-si-vnet01"
   address_space = ["21.0.0.0/20"]
-  location = module.rg2.location
+  location      = module.rg2.location
 }
 
 module "subnet1" {
@@ -118,6 +118,21 @@ module "nsg1-rule1" {
   protocol            = "Tcp"
   source_port         = "*"
   destination_port    = "22"
+  sources_address     = "*"
+  destination_address = "*"
+}
+
+module "nsg1-rule2" {
+  source              = "./NSG Rules"
+  NSG_name            = module.vnet1-nsg.NSG_name
+  rg_name             = module.vnet1-nsg.nsg_rg
+  rule_name           = "AllowRDP"
+  priority            = 151
+  direction           = "Inbound"
+  access              = "Allow"
+  protocol            = "Tcp"
+  source_port         = "*"
+  destination_port    = "3389"
   sources_address     = "*"
   destination_address = "*"
 }
@@ -183,6 +198,7 @@ module "windowsvm1" {
   admin_username = "azureuser"
   admin_password = "Password@1234"
   size           = "Standard_B1s"
+  image          = "2022-Datacenter"
   subnet-id      = module.subnet2-1.subnet_id
   pip-id         = module.windows-pip.public-ip-id
 }
@@ -224,14 +240,14 @@ module "lb-assoc2" {
 
 
 module "win-vmss01" {
-  source = "./vmss-windows"
-  vmss-name = "${var.type}-si-winvmss"
-  location = module.rg2.location
-  rg-name = module.rg2.rg_name
-  sku = "Standard_F2"
-  instances = 2
-  username = "azureuser"
-  Password = "Password!234"
-  source-image-sku = "2022-Datacenter-Server-Core"
-  subnet-id = module.subnet2-1.subnet_id
+  source           = "./vmss-windows"
+  vmss-name        = "${var.type}-ci-winvmss"
+  location         = module.RG.location
+  rg-name          = module.RG.rg_name
+  sku              = "Standard_F2"
+  instances        = 1
+  username         = "azureuser"
+  Password         = "Password!234"
+  source-image-sku = "2016-Datacenter-Server-Core"
+  subnet-id        = module.subnet1.subnet_id
 }
