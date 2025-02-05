@@ -244,7 +244,7 @@ module "win-vmss01" {
   vmss-name        = "${var.type}-ci-winvmss"
   location         = module.RG.location
   rg-name          = module.RG.rg_name
-  sku              = "Standard_F2"
+  sku              = "Standard_B1s"
   instances        = 1
   username         = "azureuser"
   Password         = "Password!234"
