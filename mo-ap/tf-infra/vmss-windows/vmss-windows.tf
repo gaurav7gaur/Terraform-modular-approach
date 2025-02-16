@@ -6,7 +6,13 @@ resource "azurerm_windows_virtual_machine_scale_set" "vmss-win" {
   instances = var.instances
   admin_username = var.username
   admin_password = var.Password
+  single_placement_group = false
+  overprovision = false
   computer_name_prefix = "vm-"
+  automatic_os_upgrade_policy {
+          disable_automatic_rollback  = false
+          enable_automatic_os_upgrade = false
+        }
 
   source_image_reference {
     publisher = "MicrosoftWindowsServer"
