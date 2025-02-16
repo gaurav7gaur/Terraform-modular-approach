@@ -255,7 +255,7 @@ module "win-vmss01" {
 module "windowsvm2" {
   source         = "./WindowsVM"
   vm_name        = "${var.type}-winvm02"
-  location       = module.rg2.location
+  location       = "eastus"
   rg_name        = module.rg2.rg_name
   admin_username = "azureuser"
   admin_password = "Password@1234"
