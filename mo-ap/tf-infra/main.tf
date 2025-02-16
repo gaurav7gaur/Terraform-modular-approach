@@ -24,14 +24,7 @@ provider "azurerm" {
   }
 
   subscription_id = "7a200d71-c12e-4edd-a634-3bb2ff9c7144"
-  /*
-  //client_id = "de20e3cd-6d07-42c5-84df-84ae74cdc7ab"
-  client_id = "ae721cbb-49a9-41ff-a460-212db29c5718"
 
-  client_secret = "FII8Q~dhhYauks_Np1z2MI95nVOOJT79PkW4Sa~K"
-
-  tenant_id = "a6859188-9a5a-4be5-a3dc-4072291d2fe1"
-*/
 }
 
 variable "type" {
