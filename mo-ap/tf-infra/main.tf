@@ -245,3 +245,16 @@ module "win-vmss01" {
   source-image-sku = "2016-Datacenter-Server-Core"
   subnet-id        = module.subnet1.subnet_id
 }
+
+module "windowsvm2" {
+  source         = "./WindowsVM"
+  vm_name        = "${var.type}-winvm02"
+  location       = module.rg2.location
+  rg_name        = module.rg2.rg_name
+  admin_username = "azureuser"
+  admin_password = "Password@1234"
+  size           = "Standard_B1s"
+  image          = "2022-Datacenter"
+  subnet-id      = module.subnet2-1.subnet_id
+  #pip-id         = module.windows-pip.public-ip-id
+}
