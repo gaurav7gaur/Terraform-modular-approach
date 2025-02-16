@@ -262,6 +262,4 @@ module "windowsvm2" {
   size           = "Standard_B1s"
   image          = "2022-Datacenter"
   subnet-id      = module.subnet2-1.subnet_id
-  
-  #pip-id         = module.windows-pip.public-ip-id
 }
